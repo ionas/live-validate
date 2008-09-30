@@ -1,20 +1,27 @@
 <?php
-
+/**
+ *  jQuery Live Form Validation Helper
+ *
+ *  @author Marc Grabanski <m@marcgrabanski.com>
+ *  @author Jeff Loiselle <jeff@newnewmedia.com>
+ */
 class JqueryFormHelper extends AppHelper {
 	
-	var $ids = array();
-	
+	var $forms = array();
 	var $helpers = array('Javascript');
 	
+	/**
+	 * Writes the jQuery code that handles the AJAX
+	 */
 	function afterRender() {
 		
 		$forms = array();
-		foreach ($this->ids as $id) {
+		foreach ($this->forms as $id) {
 			$forms[] = "#$id :input";
 		}
 		$forms = implode(', ', $forms);
 		
-		$js = <<<TEND
+		$js = <<<END
 		$(document).ready(function() {
 		   	$('$forms').change(function(){
 			    $(this).parents('form:first').ajaxSubmit({
@@ -45,14 +52,16 @@ class JqueryFormHelper extends AppHelper {
 			    });
 			});
 		 });
-TEND;
+END;
 		print $this->Javascript->codeBlock($js);
-
 	}
 	
+	/**
+	 * Creates a hidden form element that triggers AJAX validation by the associated component
+	 */
 	function validate($id) {
-		$this->ids[] = $id;
-		return $this->output('<input type="hidden" name="data[validateme]" value="1"');
+		$this->forms[] = $id;
+		return $this->output("<input type=\"hidden\" name=\"data[__validate]\" value=\"1\"");
 	}
 	
 }

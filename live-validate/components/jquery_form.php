@@ -1,26 +1,38 @@
 <?php
-	
+/**
+ *  jQuery Live Form Validation Component
+ *
+ *  @author Marc Grabanski <m@marcgrabanski.com>
+ *  @author Jeff Loiselle <jeff@newnewmedia.com>
+ */	
 class JqueryFormComponent extends Component {
 	
 	var $controller = null;
 	var $components = array('RequestHandler');
 	
+	/**
+	 * Runs validation if the incoming data requests to be validated and is AJAX
+	 */
 	function startup(&$controller) {
-		$this->controller = $controller;
-		if ($this->RequestHandler->isAjax() && !empty($this->controller->data) && !empty($this->controller->data['validateme'])) {
-			unset($this->controller->data['validateme']);
+		Configure::write('debug', 0);
+		$this->controller =& $controller;
+		if ($this->RequestHandler->isAjax() && !empty($this->controller->data) && !empty($this->controller->data['__validate'])) {
+			unset($this->controller->data['__validate']);
 			$this->validate($this->controller->data);
 		}
 	}
-		
-	function validate($models) {
+	
+	/**
+	 *  Returns a JSON encoded array of invalid fields for the models in the POST data
+	 */	
+	function validate($data) {
+				
 		$validated = array();
-		foreach ($models as $model => $data) {
+		foreach ($data as $model => $d) {
 			$class = ClassRegistry::init($model);
-			$class->set($data);
+			$class->set(array_filter($d));
 			$validated[$model] = $class->invalidFields();
 		}
-		
 		$output = array();
 		foreach($validated as $model => $data) {
 			foreach ($data as $k => $d) {
@@ -30,8 +42,7 @@ class JqueryFormComponent extends Component {
 				);
 			}
 		}
-		Configure::write('debug', 0);
-		print json_encode($output);exit;
+		die(json_encode($output));
 	}
 	
 }
