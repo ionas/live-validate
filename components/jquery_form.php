@@ -4,6 +4,7 @@
  *
  *  @author Marc Grabanski <m@marcgrabanski.com>
  *  @author Jeff Loiselle <jeff@newnewmedia.com>
+ *  @license Copyright 2009 Marc Grabanski under the MIT License
  */	
 class JqueryFormComponent extends Component {
 	
